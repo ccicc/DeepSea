@@ -1,0 +1,9 @@
+libdir="@CMAKE_INSTALL_PREFIX@/lib/deepSea"
+includedir="@CMAKE_INSTALL_PREFIX@/include/deepSea"
+
+Name: @PROJECT_NAME@
+Description: @CMAKE_PROJECT_DESCRIPTION@
+Version: @PROJECT_VERSION@
+
+Libs: -L${libdir} -lgtlib
+Cflags: -I${includedir}
