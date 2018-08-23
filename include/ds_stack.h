@@ -15,9 +15,13 @@ typedef struct DsStack DsStack;
 
 DS_API DsStack* ds_stack_init(size_t);
 
-DS_API int ds_stack_push(DsStack*, void*);
+DS_API int ds_stack_counts(DsStack*);
 
-DS_API int ds_stack_pop(DsStack*, void**);
+DS_API DS_STATUS ds_stack_push(DsStack*, void*);
+
+DS_API DS_STATUS ds_stack_pop(DsStack*, void**);
+
+DS_API DS_STATUS ds_stack_clear(DsStack*);
 
 DS_API void ds_stack_destroy(DsStack**);
 

@@ -2,15 +2,17 @@ cmake_minimum_required(VERSION 3.10)
 
 project(main VERSION 0.0.1 LANGUAGES C)
 
-set(CMAKE_PROJECT_DESCRIPTION "c library")
-
 add_subdirectory(src)
+
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_executable(main main.c)
 
 target_link_libraries(main deepSea)
 
 set(CMAKE_INSTALL_PREFIX /usr)
+
+set(CMAKE_PROJECT_DESCRIPTION "c library")
 
 configure_file(deepSea.pc.in deepSea.pc @ONLY)
 

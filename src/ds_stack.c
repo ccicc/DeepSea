@@ -14,7 +14,7 @@ struct DsStack
 DsStack* ds_stack_init(size_t size)
 {
     DsStack* stack = (DsStack*)malloc(sizeof(DsStack));
-    if(!stack) exit(DS_ERROR_MEMOUT);
+    if(!stack) exit(DS_STATUS_MEMOUT);
     if(size <= 0) size = 10;
     stack->head = (void**)calloc(size, sizeof(void*));
     stack->size = size;
@@ -22,18 +22,33 @@ DsStack* ds_stack_init(size_t size)
     return stack;
 }
 
-int ds_stack_push(DsStack* stack, void* data)
+int ds_stack_counts(DsStack* stack)
 {
-    if(stack->length >= stack->size)exit(DS_ERROR_FULL);
-    stack->head[stack->length++] = data;
-    return DS_OK;
+    if(!stack) return DS_STATUS_NULL;
+    return stack->length;
 }
 
-int ds_stack_pop(DsStack* stack, void** data)
+DS_STATUS ds_stack_push(DsStack* stack, void* data)
 {
-    if(stack->length <= 0)exit(DS_ERROR_EMPTY);
+    if(!stack) return DS_STATUS_NULL;
+    if(stack->length >= stack->size)exit(DS_STATUS_FULL);
+    stack->head[stack->length++] = data;
+    return DS_STATUS_OK;
+}
+
+DS_STATUS ds_stack_pop(DsStack* stack, void** data)
+{
+    if(!stack) return DS_STATUS_NULL;
+    if(stack->length <= 0)exit(DS_STATUS_EMPTY);
     *data = stack->head[--stack->length];
-    return DS_OK;
+    return DS_STATUS_OK;
+}
+
+DS_STATUS ds_stack_clear(DsStack* stack)
+{
+    if(!stack) return DS_STATUS_NULL;
+    stack->length = 0;
+    return DS_STATUS_OK;
 }
 
 void ds_stack_destroy(DsStack** in)

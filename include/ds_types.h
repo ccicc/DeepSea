@@ -9,10 +9,16 @@ extern "C" {
 #endif
 
 #define DS_API          extern
-#define DS_OK           (0)
-#define DS_ERROR_MEMOUT (-1)
-#define DS_ERROR_FULL   (-2)
-#define DS_ERROR_EMPTY  (-3)
+#define DS_TRUE         (1)
+#define DS_FALSE        (0)
+
+typedef enum {
+    DS_STATUS_OK,
+    DS_STATUS_MEMOUT,
+    DS_STATUS_FULL,
+    DS_STATUS_EMPTY,
+    DS_STATUS_NULL
+} DS_STATUS;
 
 #ifdef __cplusplus
 }
