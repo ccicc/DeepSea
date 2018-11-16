@@ -1,29 +1,24 @@
-cmake_minimum_required(VERSION 3.10)
+# create by lq on 2018/11/16
 
-project(main VERSION 0.0.1 LANGUAGES C)
+cmake_minimum_required(VERSION 3.4)
+
+project(DeepSea)
+
+set(CMAKE_INSTALL_PREFIX /c/DeepSea/build)
+
+include_directories(BEFORE /c/DeepSea/build/include)
+
+link_directories(/c/DeepSea/build/lib)
 
 add_subdirectory(src)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-
 add_executable(main main.c)
 
-target_link_libraries(main deepSea)
+target_link_libraries(main DeepSea)
 
-set(CMAKE_INSTALL_PREFIX /usr)
+install(DIRECTORY include DESTINATION /)
 
-set(CMAKE_PROJECT_DESCRIPTION "c library")
-
-configure_file(deepSea.pc.in deepSea.pc @ONLY)
-
-install(DIRECTORY include/ 
-    DESTINATION include/deepSea
-)
-
-install(FILES ${CMAKE_BINARY_DIR}/deepSea.pc 
-    DESTINATION lib/deepSea/pkgconfig
-)
+install(FILES README.md DESTINATION /)
 
 message(STATUS "source dir: " ${PROJECT_SOURCE_DIR})
-
-message(STATUS "binary dir: " ${PROJECT_SOURCE_DIR})
+message(STATUS "binary dir: " ${PROJECT_BINARY_DIR})

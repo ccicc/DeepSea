@@ -1,62 +1,73 @@
 // ds_stack.c
-// create by lq on 2018/08/15
+// create by lq on 2018/11/17
+//
 
 #include <stdlib.h>
-#include "../include/ds_stack.h"
+#include <string.h>
+#include "./../include/ds_stack.h"
 
-struct DsStack
+struct DS_STACK
 {
-    size_t size;
-    size_t length;
-    void** head;
+    size_t max;
+    int index;
+    void** elems;
 };
 
-DsStack* ds_stack_init(size_t size)
+DS_STACK* ds_stack_create(size_t size)
 {
-    DsStack* stack = (DsStack*)malloc(sizeof(DsStack));
-    if(!stack) exit(DS_STATUS_MEMOUT);
-    if(size <= 0) size = 10;
-    stack->head = (void**)calloc(size, sizeof(void*));
-    stack->size = size;
-    stack->length = 0;
+    DS_STACK* stack = (DS_STACK*)malloc(sizeof(DS_STACK));
+    memset(stack, 0, sizeof(DS_STACK));
+    if(NULL == stack)
+        exit(DS_STATUS_OUTMEM);
+    if(size <= 0) size = 16;
+    stack->elems = (void**)malloc(sizeof(void**));
+    if(NULL == stack->elems)
+        exit(DS_STATUS_OUTMEM);
+    stack->max = size;
+    stack->index = 0;
     return stack;
 }
 
-int ds_stack_counts(DsStack* stack)
+DS_STATUS ds_stack_push(DS_STACK* stack, void* data)
 {
-    if(!stack) return DS_STATUS_NULL;
-    return stack->length;
-}
-
-DS_STATUS ds_stack_push(DsStack* stack, void* data)
-{
-    if(!stack) return DS_STATUS_NULL;
-    if(stack->length >= stack->size)exit(DS_STATUS_FULL);
-    stack->head[stack->length++] = data;
+    if(NULL == stack)
+        return DS_STATUS_NULL;
+    if(stack->index >= stack->max)
+        return DS_STATUS_FULL;
+    stack->elems[stack->index++] = data;
     return DS_STATUS_OK;
 }
 
-DS_STATUS ds_stack_pop(DsStack* stack, void** data)
+DS_STATUS ds_stack_pop(DS_STACK* stack, void** data)
 {
-    if(!stack) return DS_STATUS_NULL;
-    if(stack->length <= 0)exit(DS_STATUS_EMPTY);
-    *data = stack->head[--stack->length];
+    if(NULL == stack)
+        return DS_STATUS_NULL;
+    if(stack->index <= 0)
+        return DS_STATUS_EMPTY;
+    if(data)
+        *data = stack->elems[--stack->index];
     return DS_STATUS_OK;
 }
 
-DS_STATUS ds_stack_clear(DsStack* stack)
+int ds_stack_counts(DS_STACK *stack)
 {
-    if(!stack) return DS_STATUS_NULL;
-    stack->length = 0;
+    return stack->index;
+}
+
+DS_STATUS ds_stack_clear(DS_STACK* stack)
+{
+    if(NULL == stack)
+        return DS_STATUS_NULL;
+    stack->index = 0;
     return DS_STATUS_OK;
 }
 
-void ds_stack_destroy(DsStack** in)
+void ds_stack_destroy(DS_STACK **in)
 {
-    if(*in)
+    if(NULL != *in)
     {
-        DsStack* stack = *in;
-        free(stack->head);
+        DS_STACK* stack = *in;
+        free(stack->elems);
         free(stack);
         *in = NULL;
     }
