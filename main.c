@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "include/ds_stack.h"
+#include <ds_stack.h>
 
 int main(void)
 {
@@ -18,9 +18,8 @@ int main(void)
 
     while(DS_STATUS_OK == ds_stack_pop(stack, (void**)&str))
         printf("str = %s\n", str);
-    
+
     ds_stack_destroy(&stack);
 
-    getchar();
     return 0;
 }

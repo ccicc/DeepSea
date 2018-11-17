@@ -1,0 +1,9 @@
+libdir=@CMAKE_INSTALL_LIBDIR@
+includedir=@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: deepSea
+Version: @PROJECT_VERSION@
+Description: c language implementation ADT
+Libs: -L${libdir}/lib -ldeepSea
+Libs.Private: -lm
+Cflags: -I${includedir}/include

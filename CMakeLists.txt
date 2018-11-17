@@ -1,24 +1,57 @@
 # create by lq on 2018/11/16
 
-cmake_minimum_required(VERSION 3.4)
+set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
-project(DeepSea)
+cmake_minimum_required(VERSION 3.12.4)
 
-set(CMAKE_INSTALL_PREFIX /c/DeepSea/build)
+project(DeepSea C)
 
-include_directories(BEFORE /c/DeepSea/build/include)
+set(CMAKE_C_STANDARD 99)
+set(PROJECT_VERSION 0.0.1)
+set(DS_VERSION_SO 1)
+set(DS_LIB deepSea)
 
-link_directories(/c/DeepSea/build/lib)
+aux_source_directory(src SOURCE_DIR)
 
-add_subdirectory(src)
+option(BUILD_SHARED_LIBS "Build shared libraries" on)
+option(BUILD_STATIC_LIBS "Build static libraries" off)
+option(BUILD_SHARED_AND_STATIC_LIBS "Build both shared and static libraries" on)
+
+if((BUILD_SHARED_LIBS AND (NOT BUILD_STATIC_LIBS)))
+    set(DS_LIBRARY_TYPE SHARED)
+else()
+    set(DS_LIBRARY_TYPE STATIC)
+endif()
+
+if(NOT BUILD_SHARED_AND_STATIC_LIBS)
+    add_library(${DS_LIB} ${DS_LIBRARY_TYPE} ${SOURCE_DIR})
+else()
+    add_library(${DS_LIB} SHARED ${SOURCE_DIR})
+    add_library(${DS_LIB}-static STATIC ${SOURCE_DIR})
+    set_target_properties(${DS_LIB}-static PROPERTIES OUTPUT_NAME ${DS_LIB})
+    set_target_properties(${DS_LIB}-static PROPERTIES PREFIX lib)
+endif()
 
 add_executable(main main.c)
 
-target_link_libraries(main DeepSea)
+target_link_libraries(main ${DS_LIB})
 
-install(DIRECTORY include DESTINATION /)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/library_config/libdeepSea.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/libdeepSea.pc @ONLY)
 
-install(FILES README.md DESTINATION /)
+install(DIRECTORY include
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libdeepSea.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/README.md
+    DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(TARGETS ${DS_LIB}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/lib EXPORT ${DS_LIB})
 
-message(STATUS "source dir: " ${PROJECT_SOURCE_DIR})
-message(STATUS "binary dir: " ${PROJECT_BINARY_DIR})
+if(BUILD_SHARED_AND_STATIC_LIBS)
+    install(TARGETS ${DS_LIB}-static DESTINATION ${CMAKE_INSTALL_LIBDIR}/lib)
+endif()
+
+set_target_properties(${DS_LIB} PROPERTIES
+    SOVERSION ${DS_VERSION_SO}
+    VERSION ${PROJECT_VERSION})
