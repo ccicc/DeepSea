@@ -16,6 +16,7 @@ aux_source_directory(src SOURCE_DIR)
 option(BUILD_SHARED_LIBS "Build shared libraries" on)
 option(BUILD_STATIC_LIBS "Build static libraries" off)
 option(BUILD_SHARED_AND_STATIC_LIBS "Build both shared and static libraries" on)
+option(ENABLE_DS_TEST "Enable building deepSea test" on)
 
 if((BUILD_SHARED_LIBS AND (NOT BUILD_STATIC_LIBS)))
     set(DS_LIBRARY_TYPE SHARED)
@@ -31,10 +32,6 @@ else()
     set_target_properties(${DS_LIB}-static PROPERTIES OUTPUT_NAME ${DS_LIB})
     set_target_properties(${DS_LIB}-static PROPERTIES PREFIX lib)
 endif()
-
-add_executable(main main.c)
-
-target_link_libraries(main ${DS_LIB})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/library_config/libdeepSea.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/libdeepSea.pc @ONLY)
@@ -55,3 +52,5 @@ endif()
 set_target_properties(${DS_LIB} PROPERTIES
     SOVERSION ${DS_VERSION_SO}
     VERSION ${PROJECT_VERSION})
+
+add_subdirectory(tests)
