@@ -12,6 +12,7 @@ set(DS_VERSION_SO 1)
 set(DS_LIB deepSea)
 
 aux_source_directory(src SOURCE_DIR)
+aux_source_directory(tests/Unity/src UNITY_SOURCE_DIR)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" on)
 option(BUILD_STATIC_LIBS "Build static libraries" off)
@@ -53,4 +54,21 @@ set_target_properties(${DS_LIB} PROPERTIES
     SOVERSION ${DS_VERSION_SO}
     VERSION ${PROJECT_VERSION})
 
-add_subdirectory(tests)
+# test
+if(ENABLE_DS_TEST)
+
+    enable_testing()
+
+    add_library(unity STATIC ${UNITY_SOURCE_DIR})
+
+    set(dsTests
+        test_ds_stack
+    )
+
+    foreach(dsTest ${dsTests})
+        add_executable(${dsTest} ${CMAKE_CURRENT_SOURCE_DIR}/tests/${dsTest}.c)
+        target_link_libraries(${dsTest} ${DS_LIB} unity)
+        add_test(${dsTest} ${dsTest})
+    endforeach()
+
+endif()

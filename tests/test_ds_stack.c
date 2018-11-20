@@ -3,19 +3,18 @@
 //
 
 #include <string.h>
-#include "Unity/examples/unity_config.h"
+#include "../include/ds_stack.h"
 #include "Unity/src/unity.h"
-#include "./../include/ds_stack.h"
 
 DS_STACK *stack = NULL;
 
-static void setup(void)
+void setUp(void)
 {
     stack = ds_stack_create(3);
     TEST_ASSERT_NOT_NULL_MESSAGE(stack, "stack initialize failed!");
 }
 
-static void teardown(void)
+void tearDown(void)
 {
     ds_stack_destroy(&stack);
     TEST_ASSERT_NULL_MESSAGE(stack, "stack destroy failed!");
@@ -70,7 +69,7 @@ static void test_dsStack_store()
     TEST_ASSERT_EQUAL_MESSAGE(ds_stack_counts(stack), 0, "unexpected counts!");
 }
 
-static int main(void)
+int main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_dsStack_counts);
