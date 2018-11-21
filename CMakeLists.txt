@@ -18,6 +18,8 @@ option(BUILD_SHARED_LIBS "Build shared libraries" on)
 option(BUILD_STATIC_LIBS "Build static libraries" off)
 option(BUILD_SHARED_AND_STATIC_LIBS "Build both shared and static libraries" on)
 option(ENABLE_DS_TEST "Enable building deepSea test" on)
+option(CMAKE_INSTALL_INCLUDEDIR "/")
+option(CMAKE_INSTALL_LIBDIR "/")
 
 if((BUILD_SHARED_LIBS AND (NOT BUILD_STATIC_LIBS)))
     set(DS_LIBRARY_TYPE SHARED)
