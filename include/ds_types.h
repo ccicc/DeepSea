@@ -6,7 +6,8 @@
 #define DSTYPES_H_INCLUDE_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #define DS_API extern
@@ -14,14 +15,15 @@ extern "C" {
 #define DS_TRUE (1)
 #define DS_FALSE (0)
 
-typedef int DS_BOOL;
-typedef enum {
-    DS_STATUS_OK,
-    DS_STATUS_NULL,
-    DS_STATUS_OUTMEM,
-    DS_STATUS_FULL,
-    DS_STATUS_EMPTY
-} DS_STATUS;
+    typedef int DS_BOOL;
+    typedef enum
+    {
+        DS_STATUS_OK,
+        DS_STATUS_NULL,
+        DS_STATUS_OUTMEM,
+        DS_STATUS_FULL,
+        DS_STATUS_EMPTY
+    } DS_STATUS;
 
 #ifdef __cplusplus
 }
