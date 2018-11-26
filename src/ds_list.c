@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <malloc.h>
-#include "../include/ds_list.c"
+#include "../include/ds_list.h"
 
 typedef struct DsListEntry
 {
@@ -19,6 +19,14 @@ struct DsList
     size_t size;
     DS_BOOL(*equal)
     (void *a, void *b);
+};
+
+struct DsListIter
+{
+    DsListEntry *head;
+    DsListEntry *curr;
+    size_t size;
+    int index;
 };
 
 static DS_STATUS ds_entry_append(DsListEntry **entryAdd, DsListEntry *in)
@@ -106,7 +114,7 @@ DS_STATUS ds_list_insert(DsList *list, int index, void *data)
 {
     if (NULL == list)
         return DS_STATUS_NULL;
-    if (index < 0 || index > list->size + 1)
+    if (index < 0 || index > list->size)
         return DS_STATUS_OUTMEM;
 
     DsListEntry *in = (DsListEntry *)malloc(sizeof(DsListEntry));
@@ -116,13 +124,20 @@ DS_STATUS ds_list_insert(DsList *list, int index, void *data)
     in->next = NULL;
     in->prev = NULL;
 
+    DS_STATUS status;
     DsListEntry *entry = list->entry;
     while (entry && entry->next && index > 0)
     {
         index--;
         entry = entry->next;
     }
-    if (DS_STATUS_OK != ds_entry_prepend(&entry, in))
+
+    if (index == list->size)
+        status = ds_entry_append(&entry, in);
+    else
+        status = ds_entry_prepend(&entry, in);
+
+    if (status != DS_STATUS_OK)
     {
         free(in);
         return DS_STATUS_NULL;
@@ -189,8 +204,8 @@ DS_STATUS ds_list_get(DsList *list, int index, void **pdata)
         index--;
         entry = entry->next;
     }
-
-    *pdata = entry->data;
+    if (NULL != pdata)
+        *pdata = entry->data;
     return DS_STATUS_OK;
 }
 
@@ -213,3 +228,60 @@ void ds_list_destroy(DsList **plist)
     return;
 }
 
+DsListIter *ds_list_iter_create(DsList *list)
+{
+    if (NULL == list)
+        return NULL;
+    DsListIter *iter = (DsListIter *)malloc(sizeof(DsListIter));
+    if (NULL == iter)
+        exit(DS_STATUS_OUTMEM);
+    iter->head = (DsListEntry *)malloc(sizeof(DsListEntry));
+    if (NULL == iter->head)
+        exit(DS_STATUS_OUTMEM);
+    iter->head->data = NULL;
+    iter->head->prev = NULL;
+    iter->head->next = list->entry;
+    iter->curr = iter->head;
+    iter->size = list->size;
+    iter->index = -1;
+    return iter;
+}
+
+DS_BOOL ds_list_iter_hasNext(DsListIter *iter)
+{
+    if (NULL == iter)
+        return DS_FALSE;
+    return NULL != iter->curr->next;
+}
+
+DS_STATUS ds_list_iter_next(DsListIter *iter, void **pdata)
+{
+    if (NULL == iter || NULL == iter->curr)
+        return DS_STATUS_NULL;
+    iter->curr = iter->curr->next;
+    iter->index++;
+    if (NULL != pdata)
+        *pdata = iter->curr->data;
+    return DS_STATUS_OK;
+}
+
+DS_STATUS ds_list_iter_val(DsListIter *iter, void **pdata)
+{
+    if (NULL == iter || NULL == iter->curr)
+        return DS_STATUS_NULL;
+    if (NULL != pdata)
+        *pdata = iter->curr->data;
+    return DS_STATUS_OK;
+}
+
+void ds_list_iter_destroy(DsListIter **piter)
+{
+    if (*piter)
+    {
+        DsListIter *iter = *piter;
+        free(iter->head);
+        free(iter);
+        *piter = NULL;
+    }
+    return;
+}

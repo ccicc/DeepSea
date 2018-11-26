@@ -14,7 +14,7 @@ extern "C"
 #endif
 
     typedef DsList DsList;
-    typedef DsIter DsIter;
+    typedef DsListIter DsListIter;
 
     // 创建链表
     DS_API DsList *ds_list_create(void);
@@ -39,6 +39,21 @@ extern "C"
 
     // 销毁链表
     DS_API void ds_list_destroy(DsList **);
+
+    // 创建链表迭代器
+    DS_API DsListIter *ds_list_iter_create(DsList *);
+
+    // 迭代器是否有下一个元素
+    DS_API DS_BOOL ds_list_iter_hasNext(DsListIter *);
+
+    // 获取迭代器的下一个元素
+    DS_API DS_STATUS ds_list_iter_next(DsListIter *, void **);
+
+    // 获取迭代器当前节点数据
+    DS_API DS_STATUS ds_list_iter_val(DsListIter *, void **);
+
+    // 销毁迭代器
+    DS_API void ds_list_iter_destroy(DsListIter **);
 
 #ifdef __cplusplus
 }

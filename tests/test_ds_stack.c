@@ -6,7 +6,7 @@
 #include "../include/ds_stack.h"
 #include "Unity/src/unity.h"
 
-DS_STACK *stack = NULL;
+DsStack *stack = NULL;
 
 void setUp(void)
 {
