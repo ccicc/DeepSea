@@ -65,6 +65,7 @@ if(ENABLE_DS_TEST)
 
     set(dsTests
         test_ds_stack
+        test_ds_list
     )
 
     foreach(dsTest ${dsTests})

@@ -2,6 +2,7 @@
 // create by lq on 2018/11/25
 //
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
 #include "../include/ds_list.h"
@@ -17,8 +18,7 @@ struct DsList
 {
     DsListEntry *entry;
     size_t size;
-    DS_BOOL(*equal)
-    (void *a, void *b);
+    DS_BOOL(*equal)(void *a, void *b);
 };
 
 struct DsListIter
@@ -80,6 +80,9 @@ static DS_STATUS ds_entry_remove(DsListEntry **entryAdd)
             entry->prev->next = entry->next;
         else
             *entryAdd = entry->next;
+
+        if (entry->next)
+            entry->next->prev = entry->prev;
     }
     free(entry);
     return DS_STATUS_OK;
@@ -125,17 +128,20 @@ DS_STATUS ds_list_insert(DsList *list, int index, void *data)
     in->prev = NULL;
 
     DS_STATUS status;
-    DsListEntry *entry = list->entry;
-    while (entry && entry->next && index > 0)
+
+    // ! 这里需要获取list->entry的地址
+    DsListEntry **entry = &list->entry;
+    while ((*entry) && (*entry)->next && index > 0)
     {
         index--;
-        entry = entry->next;
+        // ! 需要改变的是entry的地址
+        entry = &(*entry)->next;
     }
 
     if (index == list->size)
-        status = ds_entry_append(&entry, in);
+        status = ds_entry_append(entry, in);
     else
-        status = ds_entry_prepend(&entry, in);
+        status = ds_entry_prepend(entry, in);
 
     if (status != DS_STATUS_OK)
     {
@@ -158,8 +164,8 @@ DS_STATUS ds_list_prepend(DsList *list, void *data)
     in->prev = NULL;
     in->next = NULL;
 
-    DsListEntry *entry = list->entry;
-    if (DS_STATUS_OK != ds_entry_prepend(&entry, in))
+    DsListEntry **entry = &list->entry;
+    if (DS_STATUS_OK != ds_entry_prepend(entry, in))
     {
         free(in);
         return DS_STATUS_NULL;
@@ -180,8 +186,7 @@ DS_STATUS ds_list_append(DsList *list, void *data)
     in->next = NULL;
     in->prev = NULL;
 
-    DsListEntry *entry = list->entry;
-    if (DS_STATUS_OK != ds_entry_append(&entry, in))
+    if (DS_STATUS_OK != ds_entry_append(&list->entry, in))
     {
         free(in);
         return DS_STATUS_NULL;
@@ -189,6 +194,68 @@ DS_STATUS ds_list_append(DsList *list, void *data)
 
     (list->size)++;
     return DS_STATUS_OK;
+}
+
+DS_STATUS ds_list_remove(DsList *list, int index, void **pdata)
+{
+    if (NULL == list || NULL == list->entry)
+        return DS_STATUS_NULL;
+    if (index < 0 || index >= list->size)
+        return DS_STATUS_OUTMEM;
+    DsListEntry **entry = &list->entry;
+    while ((*entry)->next && index > 0)
+    {
+        index--;
+        entry = &(*entry)->next;
+    }
+    if (NULL != pdata)
+        *pdata = (*entry)->data;
+    (list->size)--;
+    return ds_entry_remove(entry);
+}
+
+DS_STATUS ds_list_remove_first(DsList *list, void **pdata)
+{
+    if (NULL == list || NULL == list->entry)
+        return DS_STATUS_NULL;
+
+    DsListEntry **entry = &list->entry;
+    if (NULL != pdata)
+        *pdata = (*entry)->data;
+
+    (list->size)--;
+    return ds_entry_remove(entry);
+}
+
+DS_STATUS ds_list_remove_last(DsList *list, void **pdata)
+{
+    if (NULL == list || NULL == list->entry)
+        return DS_STATUS_NULL;
+
+    DsListEntry **entry = &list->entry;
+    while ((*entry)->next)
+        entry = &(*entry)->next;
+
+    if (NULL != pdata)
+        *pdata = (*entry)->data;
+    (list->size)--;
+    return ds_entry_remove(entry);
+}
+
+int ds_list_find_index(DsList *list, void *data)
+{
+    if (NULL == list || NULL == list->equal || NULL == list->entry)
+        return -1;
+    DsListEntry *entry = list->entry;
+    int i = 0;
+    while (entry)
+    {
+        if ((*(list->equal))(data, entry->data))
+            return i;
+        i++;
+        entry = entry->next;
+    }
+    return -1;
 }
 
 DS_STATUS ds_list_get(DsList *list, int index, void **pdata)
@@ -204,8 +271,7 @@ DS_STATUS ds_list_get(DsList *list, int index, void **pdata)
         index--;
         entry = entry->next;
     }
-    if (NULL != pdata)
-        *pdata = entry->data;
+    *pdata = entry->data;
     return DS_STATUS_OK;
 }
 
@@ -221,7 +287,6 @@ void ds_list_destroy(DsList **plist)
             entry = entry->next;
             free(temp);
         }
-        list->size = 0;
         free(list);
         *plist = NULL;
     }

@@ -5,22 +5,22 @@
 #ifndef DSLIST_H_INCLUDE_
 #define DSLIST_H_INCLUDE_
 
-#include <stddef.h>
-#include "ds_types.h"
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-    typedef DsList DsList;
-    typedef DsListIter DsListIter;
+#include <stddef.h>
+#include "ds_types.h"
+
+    typedef struct DsList DsList;
+    typedef struct DsListIter DsListIter;
 
     // 创建链表
     DS_API DsList *ds_list_create(void);
 
     // 创建带有比较函数指针的链表
-    DS_API DsList *ds_list_create_equal(DS_BOOL *(void *, void *));
+    DS_API DsList *ds_list_create_equal(DS_BOOL (*equal)(void *, void *));
 
     // 链表长度
     DS_API size_t ds_list_size(DsList *);
@@ -33,6 +33,18 @@ extern "C"
 
     // 链尾插入元素
     DS_API DS_STATUS ds_list_append(DsList *, void *);
+
+    // 移除链表元素
+    DS_API DS_STATUS ds_list_remove(DsList *, int, void **);
+
+    // 移除链首元素
+    DS_API DS_STATUS ds_list_remove_first(DsList *, void **);
+
+    // 移除链尾元素
+    DS_API DS_STATUS ds_list_remove_last(DsList *, void **);
+
+    // 查找指定元素索引
+    DS_API int ds_list_find_index(DsList *, void *);
 
     // 获取链表元素
     DS_API DS_STATUS ds_list_get(DsList *, int, void **);
